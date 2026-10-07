@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DIFM</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f7b6c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DIFM">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e9eeec;--card:#fff;--ink:#14233a;--mute:#5d6b7e;--line:#d3dbd8;--acc:#0f7b6c;--acc-ink:#fff;--chip:#f6d574;--chip-ink:#3d2f00;--err:#b3261e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1816;--card:#16231f;--ink:#e8f0ee;--mute:#9fb0ab;--line:#2a3b36;--acc:#3cc2ad;--acc-ink:#07201b;--chip:#c9a83c;--chip-ink:#1b1400;--err:#ff8a80}}
+:root[data-theme="dark"]{--bg:#0e1816;--card:#16231f;--ink:#e8f0ee;--mute:#9fb0ab;--line:#2a3b36;--acc:#3cc2ad;--acc-ink:#07201b;--chip:#c9a83c;--chip-ink:#1b1400;--err:#ff8a80}
+*,*:before,*:after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Figtree,system-ui,sans-serif;min-height:100vh}
+h1,h2{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;line-height:1.15;margin:0}
+main{max-width:440px;margin:0 auto;padding:28px 16px 48px}
+.brand{font:700 22px "Bricolage Grotesque",Figtree,sans-serif;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.brand i{width:14px;height:14px;border-radius:50%;background:var(--acc);box-shadow:10px 0 0 -3px var(--chip);margin-right:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+h1{font-size:28px;margin-bottom:6px}
+.sub{color:var(--mute);margin:0 0 18px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:20px}
+.tabs button{border:0;background:none;color:var(--mute);font:600 15px inherit;font-family:inherit;padding:9px;border-radius:7px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--card);color:var(--ink)}
+label{display:block;font-weight:600;font-size:14px;margin:14px 0 5px}
+input{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+input:disabled{opacity:.7}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button.primary{width:100%;margin-top:20px;background:var(--acc);color:var(--acc-ink);border:0;border-radius:10px;padding:13px;font:600 16px inherit;font-family:inherit;cursor:pointer}
+button.ghost{background:none;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:8px 14px;font:600 14px inherit;font-family:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.err{color:var(--err);font-size:14px;margin:12px 0 0;min-height:1em}
+.hint{color:var(--mute);font-size:13px;margin:5px 0 0}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{background:var(--chip);color:var(--chip-ink);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:600;border:0;font-family:inherit}
+button.chip{cursor:pointer}
+.empty{color:var(--mute);font-size:14px;margin:10px 0 0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+.note{margin-top:18px;color:var(--mute);font-size:13px;text-align:center}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <div class="brand"><i></i>DIFM</div>
+
+  <!-- Auth -->
+  <section id="auth" class="card">
+    <h1 id="authTitle">Welcome back</h1>
+    <p class="sub" id="authSub">Log in to see your profile.</p>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tabLogin" aria-selected="true">Log in</button>
+      <button role="tab" id="tabSignup" aria-selected="false">Create account</button>
+    </div>
+    <div id="signupOnly" hidden>
+      <div class="row">
+        <div><label for="sFirst">First name</label><input id="sFirst" autocomplete="given-name"></div>
+        <div><label for="sLast">Surname</label><input id="sLast" autocomplete="family-name"></div>
+      </div>
+    </div>
+    <label for="email">Email</label>
+    <input id="email" type="email" autocomplete="email">
+    <label for="pw">Password</label>
+    <input id="pw" type="password" autocomplete="current-password">
+    <p class="hint" id="pwHint" hidden>At least 8 characters.</p>
+    <p class="err" id="authErr" role="alert"></p>
+    <button class="primary" id="authBtn">Log in</button>
+  </section>
+
+  <!-- Profile -->
+  <section id="profile" hidden>
+    <div class="top">
+      <h2 id="hello"></h2>
+      <button class="ghost" id="logout">Log out</button>
+    </div>
+    <div class="card">
+      <div class="top" style="margin-bottom:0">
+        <h1 style="font-size:22px">Your profile</h1>
+        <button class="ghost" id="editBtn">Edit profile</button>
+      </div>
+      <div class="row">
+        <div><label for="pFirst">First name</label><input id="pFirst" disabled></div>
+        <div><label for="pLast">Surname</label><input id="pLast" disabled></div>
+      </div>
+      <label for="pEmail">Email</label>
+      <input id="pEmail" disabled>
+      <label for="pDob">Date of birth</label>
+      <input id="pDob" type="date" disabled>
+      <label for="skillIn">Skills</label>
+      <input id="skillIn" placeholder="Type a skill, press Enter" hidden>
+      <p class="hint" id="skillHint" hidden>Press Enter or comma to add. Tap a skill to remove it.</p>
+      <div class="chips" id="chips"></div>
+      <p class="empty" id="noSkills">No skills yet. Add some so others know how you can help.</p>
+      <p class="err" id="profErr" role="alert"></p>
+      <button class="primary" id="saveBtn" hidden>Save changes</button>
+    </div>
+  </section>
+
+  <p class="note">Prototype: data lives in this page's memory and resets on refresh.</p>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var users=[], current=null, mode='login', editing=false, skills=[];
+
+  function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on')},2000)}
+
+  function setMode(m){
+    mode=m;var s=m==='signup';
+    $('tabLogin').setAttribute('aria-selected',!s);
+    $('tabSignup').setAttribute('aria-selected',s);
+    $('signupOnly').hidden=!s;$('pwHint').hidden=!s;
+    $('authTitle').textContent=s?'Create your account':'Welcome back';
+    $('authSub').textContent=s?'Share tasks with people who have the right skills.':'Log in to see your profile.';
+    $('authBtn').textContent=s?'Create account':'Log in';
+    $('pw').autocomplete=s?'new-password':'current-password';
+    $('authErr').textContent='';
+  }
+  $('tabLogin').onclick=function(){setMode('login')};
+  $('tabSignup').onclick=function(){setMode('signup')};
+
+  $('authBtn').onclick=function(){
+    var email=$('email').value.trim().toLowerCase(), pw=$('pw').value, err=$('authErr');
+    if(!/^\S+@\S+\.\S+$/.test(email)){err.textContent='Enter a valid email address.';return}
+    if(mode==='signup'){
+      var f=$('sFirst').value.trim(), l=$('sLast').value.trim();
+      if(!f||!l){err.textContent='Enter your first name and surname.';return}
+      if(pw.length<8){err.textContent='Password must be at least 8 characters.';return}
+      if(users.some(function(u){return u.email===email})){err.textContent='An account with this email already exists. Log in instead.';return}
+      current={first:f,last:l,email:email,pw:pw,dob:'',skills:[]};users.push(current);
+      toast('Account created');
+    }else{
+      var u=users.filter(function(x){return x.email===email&&x.pw===pw})[0];
+      if(!u){err.textContent='Email or password is incorrect. Create an account if you are new.';return}
+      current=u;toast('Logged in');
+    }
+    $('pw').value='';err.textContent='';showProfile();
+  };
+
+  function showProfile(){
+    $('auth').hidden=true;$('profile').hidden=false;
+    $('hello').textContent='Hi, '+current.first;
+    skills=current.skills.slice();
+    fill();setEdit(mode==='signup'&&!current.dob);
+  }
+  function fill(){
+    $('pFirst').value=current.first;$('pLast').value=current.last;
+    $('pEmail').value=current.email;$('pDob').value=current.dob;renderSkills();
+  }
+  function renderSkills(){
+    var c=$('chips');c.innerHTML='';
+    skills.forEach(function(s,i){
+      var el=document.createElement(editing?'button':'span');
+      el.className='chip';el.textContent=editing?s+' ×':s;
+      if(editing){el.setAttribute('aria-label','Remove '+s);el.onclick=function(){skills.splice(i,1);renderSkills()}}
+      c.appendChild(el);
+    });
+    $('noSkills').hidden=skills.length>0;
+  }
+  function setEdit(on){
+    editing=on;
+    ['pFirst','pLast','pDob'].forEach(function(id){$(id).disabled=!on});
+    $('skillIn').hidden=!on;$('skillHint').hidden=!on;$('saveBtn').hidden=!on;
+    $('editBtn').hidden=on;$('profErr').textContent='';renderSkills();
+  }
+  $('editBtn').onclick=function(){setEdit(true)};
+
+  function addSkill(){
+    var v=$('skillIn').value.replace(/,/g,'').trim();
+    if(v&&!skills.some(function(s){return s.toLowerCase()===v.toLowerCase()})){skills.push(v);renderSkills()}
+    $('skillIn').value='';
+  }
+  $('skillIn').onkeydown=function(e){
+    if(e.key==='Enter'||e.key===','){e.preventDefault();addSkill()}
+  };
+
+  $('saveBtn').onclick=function(){
+    addSkill();
+    var f=$('pFirst').value.trim(), l=$('pLast').value.trim(), d=$('pDob').value, err=$('profErr');
+    if(!f||!l){err.textContent='First name and surname cannot be empty.';return}
+    if(d&&new Date(d)>new Date()){err.textContent='Date of birth cannot be in the future.';return}
+    current.first=f;current.last=l;current.dob=d;current.skills=skills.slice();
+    $('hello').textContent='Hi, '+f;setEdit(false);toast('Profile saved');
+  };
+
+  $('logout').onclick=function(){
+    current=null;$('profile').hidden=true;$('auth').hidden=false;
+    $('email').value='';setMode('login');toast('Logged out');
+  };
+})();
+</script>
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+</script>
+</body>
+</html>
