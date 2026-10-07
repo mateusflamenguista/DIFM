@@ -9,8 +9,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="DIFM">
-<link rel="icon" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#e9eeec;--card:#fff;--ink:#14233a;--mute:#5d6b7e;--line:#d3dbd8;--acc:#0f7b6c;--acc-ink:#fff;--chip:#f6d574;--chip-ink:#3d2f00;--err:#b3261e;
@@ -48,16 +48,34 @@ button.chip{cursor:pointer}
 .toast.on{opacity:1}
 .note{margin-top:18px;color:var(--mute);font-size:13px;text-align:center}
 [hidden]{display:none!important}
+
+.nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav div{display:grid;grid-template-columns:repeat(3,1fr);width:100%;max-width:440px}
+.nav button{background:none;border:0;color:var(--mute);font:600 12px inherit;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;cursor:pointer}
+.nav button[aria-current="page"]{color:var(--acc)}
+.nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tiles{display:grid;gap:12px;margin-top:16px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;justify-content:space-between;align-items:center;font-weight:600}
+button.tile{font:inherit;font-weight:600;color:var(--ink);width:100%;text-align:left;cursor:pointer}
+.tile small{color:var(--mute);font-weight:500}
+main.in{padding-bottom:100px}
+
+.back{background:none;border:0;color:var(--acc);font:600 16px inherit;font-family:inherit;padding:4px 0;margin-bottom:12px;cursor:pointer}
+.rating{display:flex;align-items:center;gap:10px;margin:6px 0 20px}
+.stars{color:var(--line);font-size:22px;letter-spacing:2px}
+.rating small{color:var(--mute);font-size:14px}
+.chev{color:var(--mute);font-size:22px;font-weight:500}
+.doc h2{font-size:17px;margin:18px 0 4px}.doc p{margin:0;color:var(--mute);font-size:15px}.doc .draft{color:var(--ink);font-size:13px;background:var(--bg);border-radius:8px;padding:8px 10px;margin-bottom:4px}
+.ok{color:var(--acc);font-size:14px;margin:12px 0 0}
 </style>
 </head>
 <body>
-<main>
+<main id="main">
   <div class="brand"><i></i>DIFM</div>
 
-  <!-- Auth -->
   <section id="auth" class="card">
     <h1 id="authTitle">Welcome back</h1>
-    <p class="sub" id="authSub">Log in to see your profile.</p>
+    <p class="sub" id="authSub">Log in to continue.</p>
     <div class="tabs" role="tablist">
       <button role="tab" id="tabLogin" aria-selected="true">Log in</button>
       <button role="tab" id="tabSignup" aria-selected="false">Create account</button>
@@ -69,101 +87,207 @@ button.chip{cursor:pointer}
       </div>
     </div>
     <label for="email">Email</label>
-    <input id="email" type="email" autocomplete="email">
+    <input id="email" type="text" autocomplete="email" autocapitalize="none">
     <label for="pw">Password</label>
     <input id="pw" type="password" autocomplete="current-password">
-    <p class="hint" id="pwHint" hidden>At least 8 characters.</p>
-    <p class="err" id="authErr" role="alert"></p>
+    <p class="hint">Prototype mode: anything you type works.</p>
     <button class="primary" id="authBtn">Log in</button>
   </section>
 
-  <!-- Profile -->
-  <section id="profile" hidden>
-    <div class="top">
-      <h2 id="hello"></h2>
-      <button class="ghost" id="logout">Log out</button>
-    </div>
-    <div class="card">
-      <div class="top" style="margin-bottom:0">
-        <h1 style="font-size:22px">Your profile</h1>
-        <button class="ghost" id="editBtn">Edit profile</button>
+  <section id="app" hidden>
+    <div id="vHome">
+      <h1 id="hello"></h1>
+      <p class="sub">Your menu</p>
+      <div class="tiles">
+        <div class="tile">My tasks <small>Coming soon</small></div>
+        <div class="tile">Shared with me <small>Coming soon</small></div>
+        <div class="tile">Find help by skill <small>Coming soon</small></div>
       </div>
-      <div class="row">
-        <div><label for="pFirst">First name</label><input id="pFirst" disabled></div>
-        <div><label for="pLast">Surname</label><input id="pLast" disabled></div>
-      </div>
-      <label for="pEmail">Email</label>
-      <input id="pEmail" disabled>
-      <label for="pDob">Date of birth</label>
-      <input id="pDob" type="date" disabled>
-      <label for="skillIn">Skills</label>
-      <input id="skillIn" placeholder="Type a skill, press Enter" hidden>
-      <p class="hint" id="skillHint" hidden>Press Enter or comma to add. Tap a skill to remove it.</p>
-      <div class="chips" id="chips"></div>
-      <p class="empty" id="noSkills">No skills yet. Add some so others know how you can help.</p>
-      <p class="err" id="profErr" role="alert"></p>
-      <button class="primary" id="saveBtn" hidden>Save changes</button>
     </div>
-  </section>
 
-  <p class="note">Prototype: data lives in this page's memory and resets on refresh.</p>
+    <div id="vProfile" hidden>
+      <h1 id="pName" style="font-size:28px"></h1>
+      <div class="rating" aria-label="No rating yet"><span class="stars">★★★★★</span><small>No ratings yet</small></div>
+      <div class="tiles" style="margin-top:0">
+        <button class="tile go" data-go="Address">Address <span class="chev">›</span></button>
+        <button class="tile go" data-go="Payments">Payments <span class="chev">›</span></button>
+        <button class="tile go" data-go="Settings">Settings <span class="chev">›</span></button>
+        <button class="tile go" data-go="Legal">Legal <span class="chev">›</span></button>
+      </div>
+    </div>
+
+    <div id="vAddress" hidden>
+      <button class="back" data-to="Profile">‹ Back</button>
+      <h1 style="font-size:24px;margin-bottom:14px">Address</h1>
+      <div class="card">
+        <label for="aStreet" style="margin-top:0">Street and number</label><input id="aStreet" autocomplete="street-address">
+        <label for="aApt">Apartment / floor (optional)</label><input id="aApt">
+        <div class="row">
+          <div><label for="aZip">Postal code</label><input id="aZip" autocomplete="postal-code"></div>
+          <div><label for="aCity">City</label><input id="aCity" autocomplete="address-level2"></div>
+        </div>
+        <label for="aRegion">State / region</label><input id="aRegion" autocomplete="address-level1">
+        <label for="aCountry">Country</label><input id="aCountry" autocomplete="country-name">
+        <button class="primary" id="saveAddr">Save address</button>
+      </div>
+    </div>
+
+    <div id="vPayments" hidden>
+      <button class="back" data-to="Profile">‹ Back</button>
+      <h1 style="font-size:24px;margin-bottom:14px">Payments</h1>
+      <div class="card">
+        <p class="hint" style="margin:0 0 4px">Prototype only. Please don't enter real card details. Only the last 4 digits are kept, and the security code is never kept.</p>
+        <p class="ok" id="cardSaved" hidden></p>
+        <label for="cName">Cardholder name</label><input id="cName" autocomplete="off">
+        <label for="cNum">Card number</label><input id="cNum" inputmode="numeric" autocomplete="off" placeholder="0000 0000 0000 0000">
+        <div class="row">
+          <div><label for="cExp">Expiry</label><input id="cExp" autocomplete="off" placeholder="MM/YY"></div>
+          <div><label for="cCvc">Security code</label><input id="cCvc" inputmode="numeric" autocomplete="off" type="password"></div>
+        </div>
+        <p class="err" id="payErr" role="alert"></p>
+        <button class="primary" id="savePay">Save payment method</button>
+      </div>
+    </div>
+
+    <div id="vSettings" hidden>
+      <button class="back" data-to="Profile">‹ Back</button>
+      <h1 style="font-size:24px;margin-bottom:14px">Settings</h1>
+      <div class="card">
+        <div class="top" style="margin-bottom:0">
+          <h2 style="font-size:18px">Personal details</h2>
+          <button class="ghost" id="editBtn">Edit</button>
+        </div>
+        <div class="row">
+          <div><label for="pFirst">First name</label><input id="pFirst" disabled></div>
+          <div><label for="pLast">Family name</label><input id="pLast" disabled></div>
+        </div>
+        <label for="pEmail">Email</label>
+        <input id="pEmail" disabled>
+        <label for="pDob">Date of birth</label>
+        <input id="pDob" type="date" disabled>
+        <label for="skillIn">Skills</label>
+        <input id="skillIn" placeholder="Type a skill, press Enter" hidden>
+        <p class="hint" id="skillHint" hidden>Press Enter or comma to add. Tap a skill to remove it.</p>
+        <div class="chips" id="chips"></div>
+        <p class="empty" id="noSkills">No skills yet.</p>
+        <p class="err" id="profErr" role="alert"></p>
+        <button class="primary" id="saveBtn" hidden>Save changes</button>
+      </div>
+      <button class="ghost" id="logout" style="margin-top:16px;width:100%">Log out</button>
+    </div>
+
+    <div id="vLegal" hidden>
+      <button class="back" data-to="Profile">‹ Back</button>
+      <h1 style="font-size:24px;margin-bottom:14px">Legal</h1>
+      <div class="tiles" style="margin-top:0">
+        <button class="tile go" data-go="Terms">Terms of use <span class="chev">›</span></button>
+        <button class="tile go" data-go="Privacy">Privacy policy <span class="chev">›</span></button>
+      </div>
+    </div>
+
+    <div id="vTerms" hidden>
+      <button class="back" data-to="Legal">‹ Back</button>
+      <h1 style="font-size:24px">Terms of use</h1>
+      <div class="card doc" style="margin-top:14px">
+        <p class="draft">Draft placeholder text, not legal advice. Last updated October 7, 2026.</p>
+        <h2>1. Using DIFM</h2><p>DIFM helps people share tasks and find help with everyday services. You must provide accurate information and use the app lawfully.</p>
+        <h2>2. Your account</h2><p>You are responsible for your account and for keeping your login details safe. Tell us if you think someone else has accessed it.</p>
+        <h2>3. Tasks and services</h2><p>Tasks are agreements between users. DIFM connects people and is not the employer or provider of any service unless stated otherwise.</p>
+        <h2>4. Payments</h2><p>Prices, fees and payment terms will be shown before you confirm a task. Payment features are not yet active in this prototype.</p>
+        <h2>5. Conduct</h2><p>Be respectful. Harassment, fraud, or unsafe or illegal requests may lead to suspension of your account.</p>
+        <h2>6. Changes and contact</h2><p>We may update these terms and will notify you of important changes. Questions can be sent to the contact address that will be listed here.</p>
+      </div>
+    </div>
+
+    <div id="vPrivacy" hidden>
+      <button class="back" data-to="Legal">‹ Back</button>
+      <h1 style="font-size:24px">Privacy policy</h1>
+      <div class="card doc" style="margin-top:14px">
+        <p class="draft">Draft placeholder text, not legal advice. Last updated October 7, 2026.</p>
+        <h2>1. What we collect</h2><p>Account details you enter (name, email, date of birth, skills), your address, and basic payment information such as the last 4 digits of a card.</p>
+        <h2>2. Why we use it</h2><p>To run your account, match tasks with people, show your profile, and process payments once enabled.</p>
+        <h2>3. Sharing</h2><p>Parts of your profile, such as name and skills, may be visible to other users. We do not sell your personal data.</p>
+        <h2>4. Storage and security</h2><p>We aim to protect your data with appropriate security measures. This prototype keeps data only in your browser session.</p>
+        <h2>5. Your choices</h2><p>You can edit your details in Settings, and you will be able to request deletion of your account and data.</p>
+        <h2>6. Contact</h2><p>Privacy questions can be sent to the contact address that will be listed here.</p>
+      </div>
+    </div>
+
+    <div id="vServices" hidden>
+      <h1 style="font-size:24px">Services</h1>
+      <p class="sub">Pick a service to ask for help.</p>
+      <div class="tiles"><button class="tile svc" data-s="Cleaning">Cleaning <small>Tap</small></button><button class="tile svc" data-s="Cooking">Cooking <small>Tap</small></button><button class="tile svc" data-s="Gardening">Gardening <small>Tap</small></button><button class="tile svc" data-s="Pet care">Pet care <small>Tap</small></button><button class="tile svc" data-s="Repairs">Repairs <small>Tap</small></button><button class="tile svc" data-s="Tutoring">Tutoring <small>Tap</small></button></div>
+    </div>
+
+    <nav class="nav" aria-label="Main"><div>
+      <button data-v="Profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</button>
+      <button data-v="Home" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</button>
+      <button data-v="Services"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>Services</button>
+    </div></nav>
+  </section>
 </main>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
 (function(){
   var $=function(id){return document.getElementById(id)};
-  var users=[], current=null, mode='login', editing=false, skills=[];
-
-  function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on')},2000)}
+  var profiles={}, current=null, mode='login', editing=false, skills=[];
+  function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on')},1800)}
 
   function setMode(m){
     mode=m;var s=m==='signup';
-    $('tabLogin').setAttribute('aria-selected',!s);
-    $('tabSignup').setAttribute('aria-selected',s);
-    $('signupOnly').hidden=!s;$('pwHint').hidden=!s;
+    $('tabLogin').setAttribute('aria-selected',!s);$('tabSignup').setAttribute('aria-selected',s);
+    $('signupOnly').hidden=!s;
     $('authTitle').textContent=s?'Create your account':'Welcome back';
-    $('authSub').textContent=s?'Share tasks with people who have the right skills.':'Log in to see your profile.';
+    $('authSub').textContent=s?'Share tasks with people who have the right skills.':'Log in to continue.';
     $('authBtn').textContent=s?'Create account':'Log in';
-    $('pw').autocomplete=s?'new-password':'current-password';
-    $('authErr').textContent='';
   }
   $('tabLogin').onclick=function(){setMode('login')};
   $('tabSignup').onclick=function(){setMode('signup')};
 
   $('authBtn').onclick=function(){
-    var email=$('email').value.trim().toLowerCase(), pw=$('pw').value, err=$('authErr');
-    if(!/^\S+@\S+\.\S+$/.test(email)){err.textContent='Enter a valid email address.';return}
-    if(mode==='signup'){
-      var f=$('sFirst').value.trim(), l=$('sLast').value.trim();
-      if(!f||!l){err.textContent='Enter your first name and surname.';return}
-      if(pw.length<8){err.textContent='Password must be at least 8 characters.';return}
-      if(users.some(function(u){return u.email===email})){err.textContent='An account with this email already exists. Log in instead.';return}
-      current={first:f,last:l,email:email,pw:pw,dob:'',skills:[]};users.push(current);
-      toast('Account created');
-    }else{
-      var u=users.filter(function(x){return x.email===email&&x.pw===pw})[0];
-      if(!u){err.textContent='Email or password is incorrect. Create an account if you are new.';return}
-      current=u;toast('Logged in');
-    }
-    $('pw').value='';err.textContent='';showProfile();
+    var email=$('email').value.trim().toLowerCase()||'guest@difm.app';
+    var p=profiles[email];
+    if(!p){p=profiles[email]={first:'',last:'',email:email,dob:'',skills:[]}}
+    if(mode==='signup'){p.first=$('sFirst').value.trim()||p.first;p.last=$('sLast').value.trim()||p.last}
+    if(!p.first)p.first=email.split('@')[0];
+    current=p;$('pw').value='';
+    $('auth').hidden=true;$('app').hidden=false;$('main').className='in';
+    fill();setEdit(false);go('Home');toast(mode==='signup'?'Account created':'Logged in');
   };
 
-  function showProfile(){
-    $('auth').hidden=true;$('profile').hidden=false;
-    $('hello').textContent='Hi, '+current.first;
-    skills=current.skills.slice();
-    fill();setEdit(mode==='signup'&&!current.dob);
+  var VIEWS=['Home','Profile','Services','Address','Payments','Settings','Legal','Terms','Privacy'];
+  function go(v){
+    VIEWS.forEach(function(n){$('v'+n).hidden=n!==v});
+    var tab=(v==='Home'||v==='Services')?v:'Profile';
+    Array.prototype.forEach.call(document.querySelectorAll('.nav button'),function(b){b.setAttribute('aria-current',b.dataset.v===tab?'page':'false')});
+    $('hello').textContent='Hi, '+current.first;window.scrollTo(0,0);
   }
-  function fill(){
-    $('pFirst').value=current.first;$('pLast').value=current.last;
-    $('pEmail').value=current.email;$('pDob').value=current.dob;renderSkills();
-  }
+  function hook(sel,fn){Array.prototype.forEach.call(document.querySelectorAll(sel),function(b){b.onclick=function(){fn(b)}})}
+  hook('.go',function(b){go(b.dataset.go)});
+  hook('.back',function(b){go(b.dataset.to)});
+  Array.prototype.forEach.call(document.querySelectorAll('.nav button'),function(b){b.onclick=function(){go(b.dataset.v)}});
+
+  Array.prototype.forEach.call(document.querySelectorAll('.svc'),function(b){b.onclick=function(){toast(b.dataset.s+' requests: coming soon')}});
+  function showCard(){var c=current.card,e=$('cardSaved');e.hidden=!c;if(c){e.textContent='Saved card: \u2022\u2022\u2022\u2022 '+c.last4+' (exp '+c.exp+')';$('cName').value=c.name}}
+  $('saveAddr').onclick=function(){
+    current.address={street:$('aStreet').value.trim(),apt:$('aApt').value.trim(),zip:$('aZip').value.trim(),city:$('aCity').value.trim(),region:$('aRegion').value.trim(),country:$('aCountry').value.trim()};
+    toast('Address saved');go('Profile');
+  };
+  $('savePay').onclick=function(){
+    var d=$('cNum').value.replace(/\D/g,''),n=$('cName').value.trim(),x=$('cExp').value.trim(),err=$('payErr');
+    if(!n){err.textContent='Enter the cardholder name.';return}
+    if(d.length<12){err.textContent='Enter a valid card number.';return}
+    if(!/^(0[1-9]|1[0-2])\/?\d{2}$/.test(x)){err.textContent='Enter the expiry as MM/YY.';return}
+    err.textContent='';current.card={name:n,last4:d.slice(-4),exp:x.replace('/','').replace(/(\d{2})(\d{2})/,'$1/$2')};
+    $('cNum').value='';$('cCvc').value='';showCard();toast('Payment method saved');go('Profile');
+  };
+  function fill(){skills=current.skills.slice();$('pName').textContent=(current.first+' '+current.last).trim();var ad=current.address||{};$('aStreet').value=ad.street||'';$('aApt').value=ad.apt||'';$('aZip').value=ad.zip||'';$('aCity').value=ad.city||'';$('aRegion').value=ad.region||'';$('aCountry').value=ad.country||'';showCard();$('pFirst').value=current.first;$('pLast').value=current.last;$('pEmail').value=current.email;$('pDob').value=current.dob;renderSkills()}
   function renderSkills(){
     var c=$('chips');c.innerHTML='';
     skills.forEach(function(s,i){
       var el=document.createElement(editing?'button':'span');
-      el.className='chip';el.textContent=editing?s+' ×':s;
+      el.className='chip';el.textContent=editing?s+' \u00d7':s;
       if(editing){el.setAttribute('aria-label','Remove '+s);el.onclick=function(){skills.splice(i,1);renderSkills()}}
       c.appendChild(el);
     });
@@ -172,31 +296,26 @@ button.chip{cursor:pointer}
   function setEdit(on){
     editing=on;
     ['pFirst','pLast','pDob'].forEach(function(id){$(id).disabled=!on});
-    $('skillIn').hidden=!on;$('skillHint').hidden=!on;$('saveBtn').hidden=!on;
-    $('editBtn').hidden=on;$('profErr').textContent='';renderSkills();
+    $('skillIn').hidden=!on;$('skillHint').hidden=!on;$('saveBtn').hidden=!on;$('editBtn').hidden=on;
+    $('profErr').textContent='';renderSkills();
   }
   $('editBtn').onclick=function(){setEdit(true)};
-
   function addSkill(){
     var v=$('skillIn').value.replace(/,/g,'').trim();
     if(v&&!skills.some(function(s){return s.toLowerCase()===v.toLowerCase()})){skills.push(v);renderSkills()}
     $('skillIn').value='';
   }
-  $('skillIn').onkeydown=function(e){
-    if(e.key==='Enter'||e.key===','){e.preventDefault();addSkill()}
-  };
-
+  $('skillIn').onkeydown=function(e){if(e.key==='Enter'||e.key===','){e.preventDefault();addSkill()}};
   $('saveBtn').onclick=function(){
     addSkill();
-    var f=$('pFirst').value.trim(), l=$('pLast').value.trim(), d=$('pDob').value, err=$('profErr');
-    if(!f||!l){err.textContent='First name and surname cannot be empty.';return}
-    if(d&&new Date(d)>new Date()){err.textContent='Date of birth cannot be in the future.';return}
+    var f=$('pFirst').value.trim(),l=$('pLast').value.trim(),d=$('pDob').value;
+    if(!f){$('profErr').textContent='First name cannot be empty.';return}
+    if(d&&new Date(d)>new Date()){$('profErr').textContent='Date of birth cannot be in the future.';return}
     current.first=f;current.last=l;current.dob=d;current.skills=skills.slice();
-    $('hello').textContent='Hi, '+f;setEdit(false);toast('Profile saved');
+    $('pName').textContent=(f+' '+l).trim();setEdit(false);toast('Profile saved');
   };
-
   $('logout').onclick=function(){
-    current=null;$('profile').hidden=true;$('auth').hidden=false;
+    current=null;$('app').hidden=true;$('auth').hidden=false;$('main').className='';
     $('email').value='';setMode('login');toast('Logged out');
   };
 })();
