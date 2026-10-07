@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>DIFM</title>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0f7b6c">
+<meta name="theme-color" content="#20b8a4">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="DIFM">
@@ -71,7 +71,7 @@ main.in{padding-bottom:100px}
 </head>
 <body>
 <main id="main">
-  <div class="brand"><i></i>DIFM</div>
+  <div class="brand"><svg width="34" height="34" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#20b8a4"/><path transform="translate(-1.25 0)" fill="#fff" fill-rule="evenodd" d="M9.5 7H16A9 9 0 0 1 16 25H9.5Z M14 11V21H16A5 5 0 0 0 16 11Z"/></svg>DIFM</div>
 
   <section id="auth" class="card">
     <h1 id="authTitle">Welcome back</h1>
@@ -246,9 +246,9 @@ main.in{padding-bottom:100px}
   $('tabSignup').onclick=function(){setMode('signup')};
 
   $('authBtn').onclick=function(){
-    var email=$('email').value.trim().toLowerCase()||'guest@difm.app';
+    var guest=!$('email').value.trim();var email=$('email').value.trim().toLowerCase()||'guest@difm.app';
     var p=profiles[email];
-    if(!p){p=profiles[email]={first:'',last:'',email:email,dob:'',skills:[]}}
+    if(!p){p=profiles[email]={first:guest?'Jean':'',last:guest?'Laplace':'',email:email,dob:'',skills:[]}}
     if(mode==='signup'){p.first=$('sFirst').value.trim()||p.first;p.last=$('sLast').value.trim()||p.last}
     if(!p.first)p.first=email.split('@')[0];
     current=p;$('pw').value='';
