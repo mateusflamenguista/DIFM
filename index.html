@@ -66,6 +66,36 @@ main.in{padding-bottom:100px}
 .rating small{color:var(--mute);font-size:14px}
 .chev{color:var(--mute);font-size:22px;font-weight:500}
 .doc h2{font-size:17px;margin:18px 0 4px}.doc p{margin:0;color:var(--mute);font-size:15px}.doc .draft{color:var(--ink);font-size:13px;background:var(--bg);border-radius:8px;padding:8px 10px;margin-bottom:4px}
+.sw{flex:none;width:48px;height:28px;border-radius:999px;border:0;background:var(--line);position:relative;cursor:pointer;transition:background .15s}
+.sw:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw[aria-checked="true"]{background:var(--acc)}
+.sw[aria-checked="true"]:after{transform:translateX(20px)}
+.setrow{gap:14px}.setrow small{display:block;margin-top:2px;line-height:1.35}
+.grp{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:20px 0 -4px}
+
+.tile .grow{flex:1;margin-left:12px}.tile{gap:0}
+.ico{width:40px;height:40px;border-radius:12px;background:var(--bg);color:var(--acc);display:grid;place-items:center;flex:none}
+.ico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.svchead{display:flex;align-items:center;gap:12px;margin-bottom:14px}.svchead h1{font-size:24px}
+button.primary:disabled{opacity:.4;cursor:not-allowed}
+.stepper{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:4px}
+.stepper button{width:44px;height:40px;border:0;border-radius:8px;background:var(--card);color:var(--ink);font:600 22px inherit;font-family:inherit;cursor:pointer}
+.stepper output{font-weight:600}
+.chf{display:flex;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:10px}
+.chf span{padding:0 4px 0 12px;font-weight:600;color:var(--mute)}.chf input{border:0;background:none}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg button,.pm,.prov{background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:11px;font:600 15px inherit;font-family:inherit;cursor:pointer;text-align:left}
+.seg button{text-align:center}
+.seg button[aria-pressed="true"],.pm[aria-pressed="true"],.prov[aria-pressed="true"]{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc) inset}
+.pm:disabled{opacity:.5;cursor:not-allowed}
+.map{width:100%;display:block;border-radius:10px;border:1px solid var(--line);cursor:crosshair;margin-top:10px}
+.prov{display:flex;gap:12px;align-items:center;width:100%;padding:14px;background:var(--card)}
+.av{width:42px;height:42px;border-radius:50%;background:var(--chip);color:var(--chip-ink);display:grid;place-items:center;font-weight:700;flex:none}
+.prov small{display:block;color:var(--mute);font-weight:500;margin-top:2px}
+.sumrow{display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.sumrow span:first-child{color:var(--mute)}.sumrow span:last-child{font-weight:600;text-align:right}
+.pms{display:grid;gap:10px;margin-top:10px}
+.done{text-align:center}.done .ico{margin:0 auto 12px;width:56px;height:56px;border-radius:50%;background:var(--acc);color:var(--acc-ink)}.done .ico svg{width:30px;height:30px}
 .ok{color:var(--acc);font-size:14px;margin:12px 0 0}
 </style>
 </head>
@@ -109,6 +139,7 @@ main.in{padding-bottom:100px}
       <h1 id="pName" style="font-size:28px"></h1>
       <div class="rating" aria-label="No rating yet"><span class="stars">★★★★★</span><small>No ratings yet</small></div>
       <div class="tiles" style="margin-top:0">
+        <button class="tile go" data-go="Details">Details <span class="chev">›</span></button>
         <button class="tile go" data-go="Address">Address <span class="chev">›</span></button>
         <button class="tile go" data-go="Payments">Payments <span class="chev">›</span></button>
         <button class="tile go" data-go="Settings">Settings <span class="chev">›</span></button>
@@ -149,9 +180,9 @@ main.in{padding-bottom:100px}
       </div>
     </div>
 
-    <div id="vSettings" hidden>
+    <div id="vDetails" hidden>
       <button class="back" data-to="Profile">‹ Back</button>
-      <h1 style="font-size:24px;margin-bottom:14px">Settings</h1>
+      <h1 style="font-size:24px;margin-bottom:14px">Details</h1>
       <div class="card">
         <div class="top" style="margin-bottom:0">
           <h2 style="font-size:18px">Personal details</h2>
@@ -163,6 +194,8 @@ main.in{padding-bottom:100px}
         </div>
         <label for="pEmail">Email</label>
         <input id="pEmail" disabled>
+        <label for="pPhone">Phone number</label>
+        <input id="pPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+33 6 12 34 56 78" disabled>
         <label for="pDob">Date of birth</label>
         <input id="pDob" type="date" disabled>
         <label for="skillIn">Skills</label>
@@ -173,7 +206,36 @@ main.in{padding-bottom:100px}
         <p class="err" id="profErr" role="alert"></p>
         <button class="primary" id="saveBtn" hidden>Save changes</button>
       </div>
+    </div>
+
+    <div id="vSettings" hidden>
+      <button class="back" data-to="Profile">‹ Back</button>
+      <h1 style="font-size:24px;margin-bottom:14px">Settings</h1>
+      <div class="tiles" style="margin-top:0">
+        <div class="tile setrow"><span>Notifications<small>Alerts about your tasks and requests</small></span><button class="sw" role="switch" aria-checked="true" aria-label="Notifications" data-pref="notif"></button></div>
+        <button class="tile go" data-go="PrivSet">Privacy <span class="chev">›</span></button>
+      </div>
       <button class="ghost" id="logout" style="margin-top:16px;width:100%">Log out</button>
+    </div>
+
+    <div id="vPrivSet" hidden>
+      <button class="back" data-to="Settings">‹ Back</button>
+      <h1 style="font-size:24px">Privacy</h1>
+      <p class="sub" style="margin-bottom:0">All choices are off by default. You can change them at any time.</p>
+      <h2 class="grp">Performance</h2>
+      <div class="tiles">
+        <div class="tile setrow"><span>Usage analytics<small>Share how you use DIFM to help improve speed and reliability</small></span><button class="sw" role="switch" aria-checked="false" aria-label="Usage analytics" data-pref="perfAnalytics"></button></div>
+        <div class="tile setrow"><span>Personal data for performance<small>Allow your name and skills to be used to improve task matching</small></span><button class="sw" role="switch" aria-checked="false" aria-label="Personal data for performance" data-pref="perfPersonal"></button></div>
+      </div>
+      <h2 class="grp">Marketing</h2>
+      <div class="tiles">
+        <div class="tile setrow"><span>Personalised offers<small>Use your information to tailor offers and promotions</small></span><button class="sw" role="switch" aria-checked="false" aria-label="Personalised offers" data-pref="mktOffers"></button></div>
+        <div class="tile setrow"><span>Marketing partners<small>Share your information with selected partners</small></span><button class="sw" role="switch" aria-checked="false" aria-label="Marketing partners" data-pref="mktPartners"></button></div>
+      </div>
+      <h2 class="grp">Communication</h2>
+      <div class="tiles">
+        <div class="tile setrow"><span>Email updates<small>Receive news, tips and updates by email</small></span><button class="sw" role="switch" aria-checked="false" aria-label="Email updates" data-pref="commEmail"></button></div>
+      </div>
     </div>
 
     <div id="vLegal" hidden>
@@ -216,7 +278,77 @@ main.in{padding-bottom:100px}
     <div id="vServices" hidden>
       <h1 style="font-size:24px">Services</h1>
       <p class="sub">Pick a service to ask for help.</p>
-      <div class="tiles"><button class="tile svc" data-s="Cleaning">Cleaning <small>Tap</small></button><button class="tile svc" data-s="Cooking">Cooking <small>Tap</small></button><button class="tile svc" data-s="Gardening">Gardening <small>Tap</small></button><button class="tile svc" data-s="Pet care">Pet care <small>Tap</small></button><button class="tile svc" data-s="Repairs">Repairs <small>Tap</small></button><button class="tile svc" data-s="Tutoring">Tutoring <small>Tap</small></button></div>
+      <div class="tiles" id="svcList"></div>
+    </div>
+
+    <div id="vSvcForm" hidden>
+      <button class="back" data-to="Services">&#8249; Back</button>
+      <div class="svchead"><span class="ico" id="sfIcon"></span><h1 id="sfTitle"></h1></div>
+      <div class="card">
+        <label for="fDate" style="margin-top:0">Date</label><input id="fDate" type="date">
+        <label>Duration</label>
+        <div class="stepper"><button id="durMinus" aria-label="Less time">&minus;</button><output id="durVal"></output><button id="durPlus" aria-label="More time">+</button></div>
+        <p class="hint">Steps of 30 minutes.</p>
+        <label for="fChf">Compensation you are ready to pay</label>
+        <div class="chf"><span>CHF</span><input id="fChf" type="number" inputmode="decimal" min="1" step="0.5" placeholder="e.g. 40"></div>
+        <label>Location</label>
+        <div class="seg"><button id="locBtnReg" aria-pressed="true">My address</button><button id="locBtnMap" aria-pressed="false">Pick on map</button></div>
+        <p class="hint" id="locRegTxt"></p>
+        <div id="locMap" hidden>
+          <svg id="mapSvg" class="map" viewBox="0 0 300 180" role="img" aria-label="Map: tap to drop a pin">
+            <rect width="300" height="180" style="fill:var(--bg)"/>
+            <path d="M0 120 C80 90 140 150 300 100" style="stroke:#9cd3e8;stroke-width:14;fill:none"/>
+            <path d="M40 0V180M150 0V180M240 0V180M0 40H300M0 150H300" style="stroke:var(--line);stroke-width:5;fill:none"/>
+            <g id="pin" style="display:none"><path d="M0 0c-8-9-10-13-10-17a10 10 0 0 1 20 0c0 4-2 8-10 17z" fill="#e5484d"/><circle cy="-17" r="4" fill="#fff"/></g>
+          </svg>
+          <p class="hint">Demo map: tap to drop a pin. A real map service comes with the backend.</p>
+          <input id="mapLabel" placeholder="Name this place (optional)">
+        </div>
+        <p class="err" id="fErr" role="alert"></p>
+        <button class="primary" id="fContinue">Continue</button>
+      </div>
+    </div>
+
+    <div id="vProviders" hidden>
+      <button class="back" data-to="SvcForm">&#8249; Back</button>
+      <h1 style="font-size:24px">Choose a provider</h1>
+      <p class="sub" id="provSub"></p>
+      <div class="tiles" id="provList" style="margin-top:0"></div>
+      <p class="hint">Sample profiles for the demo.</p>
+      <button class="primary" id="toCart" disabled>Go to cart</button>
+    </div>
+
+    <div id="vCart" hidden>
+      <button class="back" data-to="Providers">&#8249; Back</button>
+      <h1 style="font-size:24px;margin-bottom:14px">Cart</h1>
+      <div class="card"><div id="sum"></div></div>
+      <h2 class="grp">Payment method</h2>
+      <div class="pms">
+        <button class="pm" data-pm="saved" aria-pressed="false" id="pmSaved">Registered card</button>
+        <button class="pm" data-pm="apple" aria-pressed="false">Apple Pay</button>
+        <button class="pm" data-pm="google" aria-pressed="false">Google Pay</button>
+        <button class="pm" data-pm="card" aria-pressed="false">Another card</button>
+      </div>
+      <div class="card" id="cardFields" hidden style="margin-top:12px">
+        <label for="xName" style="margin-top:0">Cardholder name</label><input id="xName" autocomplete="off">
+        <label for="xNum">Card number</label><input id="xNum" inputmode="numeric" autocomplete="off" placeholder="0000 0000 0000 0000">
+        <div class="row">
+          <div><label for="xExp">Expiry</label><input id="xExp" autocomplete="off" placeholder="MM/YY"></div>
+          <div><label for="xCvc">Security code</label><input id="xCvc" inputmode="numeric" type="password" autocomplete="off"></div>
+        </div>
+      </div>
+      <p class="hint">Demo: no real payment is made. Please don't enter real card details.</p>
+      <button class="primary" id="payBtn" disabled>Pay</button>
+    </div>
+
+    <div id="vDone" hidden class="done">
+      <div class="card">
+        <span class="ico"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+        <h1 style="font-size:24px">Request sent</h1>
+        <p class="sub" id="doneTxt" style="margin-top:8px"></p>
+        <p class="hint">Demo payment: no money was moved.</p>
+        <button class="primary" id="doneBtn">Back to home</button>
+      </div>
     </div>
 
     <nav class="nav" aria-label="Main"><div>
@@ -256,10 +388,10 @@ main.in{padding-bottom:100px}
     fill();setEdit(false);go('Home');toast(mode==='signup'?'Account created':'Logged in');
   };
 
-  var VIEWS=['Home','Profile','Services','Address','Payments','Settings','Legal','Terms','Privacy'];
+  var VIEWS=['Home','Profile','Services','SvcForm','Providers','Cart','Done','Address','Payments','Details','Settings','PrivSet','Legal','Terms','Privacy'];
   function go(v){
     VIEWS.forEach(function(n){$('v'+n).hidden=n!==v});
-    var tab=(v==='Home'||v==='Services')?v:'Profile';
+    var tab=v==='Home'?'Home':['Services','SvcForm','Providers','Cart','Done'].indexOf(v)>-1?'Services':'Profile';
     Array.prototype.forEach.call(document.querySelectorAll('.nav button'),function(b){b.setAttribute('aria-current',b.dataset.v===tab?'page':'false')});
     $('hello').textContent='Hi, '+current.first;window.scrollTo(0,0);
   }
@@ -268,7 +400,11 @@ main.in{padding-bottom:100px}
   hook('.back',function(b){go(b.dataset.to)});
   Array.prototype.forEach.call(document.querySelectorAll('.nav button'),function(b){b.onclick=function(){go(b.dataset.v)}});
 
-  Array.prototype.forEach.call(document.querySelectorAll('.svc'),function(b){b.onclick=function(){toast(b.dataset.s+' requests: coming soon')}});
+  function syncPrefs(){
+    current.prefs=current.prefs||{notif:true,perfAnalytics:false,perfPersonal:false,mktOffers:false,mktPartners:false,commEmail:false};
+    Array.prototype.forEach.call(document.querySelectorAll('.sw'),function(b){b.setAttribute('aria-checked',current.prefs[b.dataset.pref]?'true':'false')});
+  }
+  hook('.sw',function(b){var k=b.dataset.pref;current.prefs[k]=!current.prefs[k];b.setAttribute('aria-checked',current.prefs[k]?'true':'false')});
   function showCard(){var c=current.card,e=$('cardSaved');e.hidden=!c;if(c){e.textContent='Saved card: \u2022\u2022\u2022\u2022 '+c.last4+' (exp '+c.exp+')';$('cName').value=c.name}}
   $('saveAddr').onclick=function(){
     current.address={street:$('aStreet').value.trim(),apt:$('aApt').value.trim(),zip:$('aZip').value.trim(),city:$('aCity').value.trim(),region:$('aRegion').value.trim(),country:$('aCountry').value.trim()};
@@ -282,7 +418,7 @@ main.in{padding-bottom:100px}
     err.textContent='';current.card={name:n,last4:d.slice(-4),exp:x.replace('/','').replace(/(\d{2})(\d{2})/,'$1/$2')};
     $('cNum').value='';$('cCvc').value='';showCard();toast('Payment method saved');go('Profile');
   };
-  function fill(){skills=current.skills.slice();$('pName').textContent=(current.first+' '+current.last).trim();var ad=current.address||{};$('aStreet').value=ad.street||'';$('aApt').value=ad.apt||'';$('aZip').value=ad.zip||'';$('aCity').value=ad.city||'';$('aRegion').value=ad.region||'';$('aCountry').value=ad.country||'';showCard();$('pFirst').value=current.first;$('pLast').value=current.last;$('pEmail').value=current.email;$('pDob').value=current.dob;renderSkills()}
+  function fill(){syncPrefs();skills=current.skills.slice();$('pName').textContent=(current.first+' '+current.last).trim();var ad=current.address||{};$('aStreet').value=ad.street||'';$('aApt').value=ad.apt||'';$('aZip').value=ad.zip||'';$('aCity').value=ad.city||'';$('aRegion').value=ad.region||'';$('aCountry').value=ad.country||'';showCard();$('pFirst').value=current.first;$('pLast').value=current.last;$('pEmail').value=current.email;$('pPhone').value=current.phone||'';$('pDob').value=current.dob;renderSkills()}
   function renderSkills(){
     var c=$('chips');c.innerHTML='';
     skills.forEach(function(s,i){
@@ -295,7 +431,7 @@ main.in{padding-bottom:100px}
   }
   function setEdit(on){
     editing=on;
-    ['pFirst','pLast','pDob'].forEach(function(id){$(id).disabled=!on});
+    ['pFirst','pLast','pDob','pPhone'].forEach(function(id){$(id).disabled=!on});
     $('skillIn').hidden=!on;$('skillHint').hidden=!on;$('saveBtn').hidden=!on;$('editBtn').hidden=on;
     $('profErr').textContent='';renderSkills();
   }
@@ -310,10 +446,91 @@ main.in{padding-bottom:100px}
     addSkill();
     var f=$('pFirst').value.trim(),l=$('pLast').value.trim(),d=$('pDob').value;
     if(!f){$('profErr').textContent='First name cannot be empty.';return}
+    var ph=$('pPhone').value.trim();
+    if(ph&&!/^\+?[\d\s().-]{6,}$/.test(ph)){$('profErr').textContent='Enter a valid phone number.';return}
     if(d&&new Date(d)>new Date()){$('profErr').textContent='Date of birth cannot be in the future.';return}
-    current.first=f;current.last=l;current.dob=d;current.skills=skills.slice();
+    current.first=f;current.last=l;current.dob=d;current.phone=ph;current.skills=skills.slice();
     $('pName').textContent=(f+' '+l).trim();setEdit(false);toast('Profile saved');
   };
+  var SERVICES=['Cleaning','Cooking','Gardening','Pet care','Repairs','Tutoring'];
+  var IC={Cleaning:'<path d="M20 4l-9 9"/><path d="M9 11l4 4-3 6H4c0-4 2-8 5-10z"/>',
+    Cooking:'<path d="M4 11h16v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/><path d="M2 11h20M9 7c0-2 2-2 2-4M14 7c0-2 2-2 2-4"/>',
+    Gardening:'<path d="M12 21v-9M7 21h10"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 15c0-3-2-5-6-5 0 3 2 5 6 5z"/>',
+    'Pet care':'<circle cx="6" cy="11" r="2"/><circle cx="10" cy="6.5" r="2"/><circle cx="14.5" cy="6.5" r="2"/><circle cx="18.5" cy="11" r="2"/><path d="M12 12c-3 0-5 3-5 5.5 0 2 1.5 2.5 3 2.5 1 0 1.5-.5 2-.5s1 .5 2 .5c1.5 0 3-.5 3-2.5C17 15 15 12 12 12z"/>',
+    Repairs:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9l-3.8 3.8z"/>',
+    Tutoring:'<path d="M4 4h6a3 3 0 0 1 2 1 3 3 0 0 1 2-1h6v15h-6a3 3 0 0 0-2 1 3 3 0 0 0-2-1H4z"/><path d="M12 5v15"/>'};
+  function ico(n){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+IC[n]+'</svg>'}
+  var PROV=[{n:'Marie Dubois',r:4.9,j:132,s:['Cleaning','Cooking']},{n:'Luca Bernasconi',r:4.8,j:87,s:['Gardening','Repairs']},{n:'Sophie Keller',r:5.0,j:41,s:['Pet care','Tutoring']},{n:'Thomas Meier',r:4.7,j:203,s:['Repairs','Cleaning']},{n:'Amira Haddad',r:4.9,j:76,s:['Cooking','Tutoring']},{n:'Noah Fontaine',r:4.6,j:58,s:['Gardening','Pet care']},{n:'Elena Rossi',r:4.8,j:109,s:['Cleaning','Gardening']},{n:'Paul Girard',r:4.7,j:64,s:['Tutoring','Repairs']}];
+  var order={},pm=null;
+  function fmtDur(m){var h=Math.floor(m/60),r=m%60;return (h?h+' h':'')+(h&&r?' ':'')+(r?r+' min':'')}
+  function chf(v){return 'CHF '+Number(v).toFixed(2)}
+  function fmtDate(d){var p=d.split('-');return new Date(p[0],p[1]-1,p[2]).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
+  var L=$('svcList');
+  SERVICES.forEach(function(n){var b=document.createElement('button');b.className='tile';b.innerHTML='<span class="ico">'+ico(n)+'</span><span class="grow">'+n+'</span><span class="chev">\u203a</span>';b.onclick=function(){openSvc(n)};L.appendChild(b)});
+  function setDur(m){order.mins=m;$('durVal').textContent=fmtDur(m)}
+  $('durMinus').onclick=function(){setDur(Math.max(30,order.mins-30))};
+  $('durPlus').onclick=function(){setDur(Math.min(720,order.mins+30))};
+  function addrTxt(){var a=current.address;return a&&a.street?[a.street,a.apt,((a.zip||'')+' '+(a.city||'')).trim()].filter(Boolean).join(', '):''}
+  function setLoc(k){
+    order.loc=k;$('locBtnReg').setAttribute('aria-pressed',k==='registered');$('locBtnMap').setAttribute('aria-pressed',k==='map');
+    $('locMap').hidden=k!=='map';$('locRegTxt').hidden=k!=='registered';
+    $('locRegTxt').textContent=addrTxt()||'No registered address yet. Add one in Profile > Address, or pick a location on the map.';
+  }
+  $('locBtnReg').onclick=function(){setLoc('registered')};
+  $('locBtnMap').onclick=function(){setLoc('map')};
+  $('mapSvg').onclick=function(e){
+    var r=this.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*300,y=(e.clientY-r.top)/r.height*180,p=$('pin');
+    order.pin={x:x,y:y};p.setAttribute('transform','translate('+x+' '+y+')');p.style.display='block';
+  };
+  function openSvc(n){
+    order={service:n,mins:60,loc:'registered',pin:null,provider:null};
+    var t=new Date();t.setMinutes(t.getMinutes()-t.getTimezoneOffset());
+    $('sfTitle').textContent=n;$('sfIcon').innerHTML=ico(n);
+    $('fDate').min=t.toISOString().slice(0,10);$('fDate').value='';$('fChf').value='';$('mapLabel').value='';$('pin').style.display='none';
+    $('fErr').textContent='';setDur(60);setLoc('registered');go('SvcForm');
+  }
+  $('fContinue').onclick=function(){
+    var d=$('fDate').value,v=parseFloat($('fChf').value),e=$('fErr');
+    if(!d){e.textContent='Choose a date.';return}
+    if(d<$('fDate').min){e.textContent='Choose today or a later date.';return}
+    if(!(v>0)){e.textContent='Enter the compensation in CHF.';return}
+    if(order.loc==='registered'&&!addrTxt()){e.textContent='Add an address in Profile > Address, or pick a location on the map.';return}
+    if(order.loc==='map'&&!order.pin){e.textContent='Tap the map to drop a pin.';return}
+    e.textContent='';order.date=d;order.chf=v;
+    order.locText=order.loc==='registered'?addrTxt():($('mapLabel').value.trim()||'Pin on map');
+    order.provider=null;$('toCart').disabled=true;
+    $('provSub').textContent=order.service+' \u00b7 '+fmtDate(d)+' \u00b7 '+fmtDur(order.mins);
+    var P=$('provList');P.innerHTML='';
+    PROV.filter(function(p){return p.s.indexOf(order.service)>-1}).sort(function(a,b){return b.r-a.r}).forEach(function(p){
+      var b=document.createElement('button');b.className='prov';b.setAttribute('aria-pressed','false');
+      b.innerHTML='<span class="av">'+p.n.split(' ').map(function(w){return w[0]}).join('')+'</span><span><strong>'+p.n+'</strong><small>\u2605 '+p.r.toFixed(1)+' \u00b7 '+p.j+' jobs \u00b7 '+p.s.join(', ')+'</small></span>';
+      b.onclick=function(){order.provider=p;Array.prototype.forEach.call(P.children,function(c){c.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');$('toCart').disabled=false};
+      P.appendChild(b);
+    });
+    go('Providers');
+  };
+  $('toCart').onclick=function(){
+    var S=$('sum');S.innerHTML='';
+    [['Service',order.service],['Date',fmtDate(order.date)],['Duration',fmtDur(order.mins)],['Location',order.locText],['Provider',order.provider.n],['Total',chf(order.chf)]].forEach(function(r){
+      var d=document.createElement('div'),a=document.createElement('span'),b=document.createElement('span');d.className='sumrow';a.textContent=r[0];b.textContent=r[1];d.appendChild(a);d.appendChild(b);S.appendChild(d)});
+    pm=null;Array.prototype.forEach.call(document.querySelectorAll('.pm'),function(b){b.setAttribute('aria-pressed','false')});
+    var sv=$('pmSaved');sv.disabled=!current.card;sv.textContent=current.card?'Registered card \u2022\u2022\u2022\u2022 '+current.card.last4:'Registered card (none saved yet)';
+    $('cardFields').hidden=true;['xName','xNum','xExp','xCvc'].forEach(function(i){$(i).value=''});
+    $('payBtn').textContent='Pay '+chf(order.chf);$('payBtn').disabled=true;go('Cart');
+  };
+  function cardOk(){return $('xName').value.trim()&&$('xNum').value.replace(/\D/g,'').length>=12&&/^(0[1-9]|1[0-2])\/?\d{2}$/.test($('xExp').value.trim())&&/^\d{3,4}$/.test($('xCvc').value.trim())}
+  function updatePay(){$('payBtn').disabled=!(pm&&(pm!=='card'||cardOk()))}
+  hook('.pm',function(b){if(b.disabled)return;pm=b.dataset.pm;Array.prototype.forEach.call(document.querySelectorAll('.pm'),function(c){c.setAttribute('aria-pressed',c===b?'true':'false')});$('cardFields').hidden=pm!=='card';updatePay()});
+  ['xName','xNum','xExp','xCvc'].forEach(function(i){$(i).oninput=updatePay});
+  $('payBtn').onclick=function(){
+    var b=this;b.disabled=true;b.textContent='Processing\u2026';
+    setTimeout(function(){
+      var ref='DIFM-'+Math.floor(100000+Math.random()*900000);
+      $('doneTxt').textContent=order.provider.n+' will receive your '+order.service.toLowerCase()+' request for '+fmtDate(order.date)+'. Reference '+ref+'.';
+      ['xName','xNum','xExp','xCvc'].forEach(function(i){$(i).value=''});go('Done');
+    },1200);
+  };
+  $('doneBtn').onclick=function(){go('Home')};
   $('logout').onclick=function(){
     current=null;$('app').hidden=true;$('auth').hidden=false;$('main').className='';
     $('email').value='';setMode('login');toast('Logged out');
