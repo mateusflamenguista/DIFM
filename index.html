@@ -96,6 +96,25 @@ button.primary:disabled{opacity:.4;cursor:not-allowed}
 .sumrow span:first-child{color:var(--mute)}.sumrow span:last-child{font-weight:600;text-align:right}
 .pms{display:grid;gap:10px;margin-top:10px}
 .done{text-align:center}.done .ico{margin:0 auto 12px;width:56px;height:56px;border-radius:50%;background:var(--acc);color:var(--acc-ink)}.done .ico svg{width:30px;height:30px}
+
+.hhead{display:flex;align-items:center;gap:12px}.hhead .grow{flex:1;min-width:0}.hhead h1{font-size:22px}
+.bell{position:relative;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center;cursor:pointer;flex:none}
+.bell svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.badge{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;border-radius:9px;background:#e5484d;color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.sbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:5;margin-top:16px}
+.sbar input{border-radius:999px;padding:13px 18px;background:var(--card);box-shadow:0 8px 24px rgba(0,0,0,.14)}
+.qres{position:absolute;left:0;right:0;top:calc(100% + 8px);background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.18);max-height:60vh;overflow:auto;padding:6px}
+.qr{display:flex;gap:12px;align-items:center;width:100%;padding:10px;border:0;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer;border-radius:10px}
+.qr small,.pc small,.bk small,.nt small{display:block;color:var(--mute);font-weight:500;font-size:13px}
+.car{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:12px -16px 0;padding:2px 16px 8px;scrollbar-width:none}
+.car::-webkit-scrollbar{display:none}.car>*{scroll-snap-align:start;flex:none}
+.qc{width:92px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:8px;font:600 13px inherit;font-family:inherit;color:var(--ink);cursor:pointer}
+.pc{width:158px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;font:inherit;color:var(--ink);text-align:left;cursor:pointer}
+.bk{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px}
+.bk .grow,.nt .grow{flex:1;min-width:0}
+.st{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--chip);color:var(--chip-ink);flex:none}.st.ok{background:var(--acc);color:var(--acc-ink)}
+.nt{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--acc);flex:none}
 .ok{color:var(--acc);font-size:14px;margin:12px 0 0}
 </style>
 </head>
@@ -126,13 +145,12 @@ button.primary:disabled{opacity:.4;cursor:not-allowed}
 
   <section id="app" hidden>
     <div id="vHome">
-      <h1 id="hello"></h1>
-      <p class="sub">Your menu</p>
-      <div class="tiles">
-        <div class="tile">My tasks <small>Coming soon</small></div>
-        <div class="tile">Shared with me <small>Coming soon</small></div>
-        <div class="tile">Find help by skill <small>Coming soon</small></div>
-      </div>
+      <div class="hhead"><span class="av" id="hAv"></span><div class="grow"><h1 id="hello"></h1><p class="sub" style="margin:0">What do you need today?</p></div>
+        <button class="bell" id="bell" aria-label="Notifications"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="badge" id="badge" hidden></span></button></div>
+      <div class="sbar"><input id="q" type="search" placeholder="Search services or providers" autocomplete="off" aria-label="Search"><div class="qres" id="qres" hidden></div></div>
+      <h2 class="grp" style="margin-top:22px">Quick request</h2><div class="car" id="carSvc"></div>
+      <h2 class="grp">Upcoming bookings</h2><div id="bookings"></div>
+      <h2 class="grp">Top-rated providers</h2><div class="car" id="carProv"></div>
     </div>
 
     <div id="vProfile" hidden>
@@ -282,15 +300,17 @@ button.primary:disabled{opacity:.4;cursor:not-allowed}
     </div>
 
     <div id="vSvcForm" hidden>
-      <button class="back" data-to="Services">&#8249; Back</button>
+      <button class="back" id="sfBack" data-to="Services">&#8249; Back</button>
       <div class="svchead"><span class="ico" id="sfIcon"></span><h1 id="sfTitle"></h1></div>
+      <p class="sub" id="sfProv" hidden style="margin:-6px 0 12px"></p>
       <div class="card">
         <label for="fDate" style="margin-top:0">Date</label><input id="fDate" type="date">
         <label>Duration</label>
         <div class="stepper"><button id="durMinus" aria-label="Less time">&minus;</button><output id="durVal"></output><button id="durPlus" aria-label="More time">+</button></div>
         <p class="hint">Steps of 30 minutes.</p>
-        <label for="fChf">Compensation you are ready to pay</label>
-        <div class="chf"><span>CHF</span><input id="fChf" type="number" inputmode="decimal" min="1" step="0.5" placeholder="e.g. 40"></div>
+        <div id="compWrap"><label for="fChf">Compensation you are ready to pay</label>
+        <div class="chf"><span>CHF</span><input id="fChf" type="number" inputmode="decimal" min="1" step="0.5" placeholder="e.g. 40"></div></div>
+        <div id="priceWrap" hidden><label>Price</label><div class="tile" style="font-weight:600"><span id="priceTxt"></span></div><p class="hint">Set by the provider. It updates with the duration.</p></div>
         <label>Location</label>
         <div class="seg"><button id="locBtnReg" aria-pressed="true">My address</button><button id="locBtnMap" aria-pressed="false">Pick on map</button></div>
         <p class="hint" id="locRegTxt"></p>
@@ -319,7 +339,7 @@ button.primary:disabled{opacity:.4;cursor:not-allowed}
     </div>
 
     <div id="vCart" hidden>
-      <button class="back" data-to="Providers">&#8249; Back</button>
+      <button class="back" id="cartBack" data-to="Providers">&#8249; Back</button>
       <h1 style="font-size:24px;margin-bottom:14px">Cart</h1>
       <div class="card"><div id="sum"></div></div>
       <h2 class="grp">Payment method</h2>
@@ -349,6 +369,20 @@ button.primary:disabled{opacity:.4;cursor:not-allowed}
         <p class="hint">Demo payment: no money was moved.</p>
         <button class="primary" id="doneBtn">Back to home</button>
       </div>
+    </div>
+
+    <div id="vProvPage" hidden>
+      <button class="back" data-to="Home">&#8249; Back</button>
+      <div class="svchead"><span class="av" id="ppAv" style="width:56px;height:56px;font-size:20px"></span><div><h1 id="ppName" style="font-size:24px"></h1><p class="sub" id="ppMeta" style="margin:0"></p></div></div>
+      <h2 class="grp">Choose a service</h2>
+      <div class="tiles" id="ppSvc"></div>
+      <p class="hint">This provider sets the price.</p>
+    </div>
+
+    <div id="vNotifs" hidden>
+      <button class="back" data-to="Home">&#8249; Back</button>
+      <h1 style="font-size:24px;margin-bottom:14px">Notifications</h1>
+      <div class="tiles" id="nList" style="margin-top:0"></div>
     </div>
 
     <nav class="nav" aria-label="Main"><div>
@@ -388,12 +422,12 @@ button.primary:disabled{opacity:.4;cursor:not-allowed}
     fill();setEdit(false);go('Home');toast(mode==='signup'?'Account created':'Logged in');
   };
 
-  var VIEWS=['Home','Profile','Services','SvcForm','Providers','Cart','Done','Address','Payments','Details','Settings','PrivSet','Legal','Terms','Privacy'];
+  var VIEWS=['Home','ProvPage','Notifs','Profile','Services','SvcForm','Providers','Cart','Done','Address','Payments','Details','Settings','PrivSet','Legal','Terms','Privacy'];
   function go(v){
     VIEWS.forEach(function(n){$('v'+n).hidden=n!==v});
-    var tab=v==='Home'?'Home':['Services','SvcForm','Providers','Cart','Done'].indexOf(v)>-1?'Services':'Profile';
+    var tab=(v==='Home'||v==='ProvPage'||v==='Notifs')?'Home':['SvcForm','Providers','Cart','Done'].indexOf(v)>-1?(order.home?'Home':'Services'):v==='Services'?'Services':'Profile';
     Array.prototype.forEach.call(document.querySelectorAll('.nav button'),function(b){b.setAttribute('aria-current',b.dataset.v===tab?'page':'false')});
-    $('hello').textContent='Hi, '+current.first;window.scrollTo(0,0);
+    $('hello').textContent='Hi, '+current.first;if(v==='Home')renderHome();window.scrollTo(0,0);
   }
   function hook(sel,fn){Array.prototype.forEach.call(document.querySelectorAll(sel),function(b){b.onclick=function(){fn(b)}})}
   hook('.go',function(b){go(b.dataset.go)});
@@ -460,14 +494,14 @@ button.primary:disabled{opacity:.4;cursor:not-allowed}
     Repairs:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9l-3.8 3.8z"/>',
     Tutoring:'<path d="M4 4h6a3 3 0 0 1 2 1 3 3 0 0 1 2-1h6v15h-6a3 3 0 0 0-2 1 3 3 0 0 0-2-1H4z"/><path d="M12 5v15"/>'};
   function ico(n){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+IC[n]+'</svg>'}
-  var PROV=[{n:'Marie Dubois',r:4.9,j:132,s:['Cleaning','Cooking']},{n:'Luca Bernasconi',r:4.8,j:87,s:['Gardening','Repairs']},{n:'Sophie Keller',r:5.0,j:41,s:['Pet care','Tutoring']},{n:'Thomas Meier',r:4.7,j:203,s:['Repairs','Cleaning']},{n:'Amira Haddad',r:4.9,j:76,s:['Cooking','Tutoring']},{n:'Noah Fontaine',r:4.6,j:58,s:['Gardening','Pet care']},{n:'Elena Rossi',r:4.8,j:109,s:['Cleaning','Gardening']},{n:'Paul Girard',r:4.7,j:64,s:['Tutoring','Repairs']}];
+  var PROV=[{n:'Marie Dubois',p:38,r:4.9,j:132,s:['Cleaning','Cooking']},{n:'Luca Bernasconi',p:45,r:4.8,j:87,s:['Gardening','Repairs']},{n:'Sophie Keller',p:30,r:5.0,j:41,s:['Pet care','Tutoring']},{n:'Thomas Meier',p:52,r:4.7,j:203,s:['Repairs','Cleaning']},{n:'Amira Haddad',p:42,r:4.9,j:76,s:['Cooking','Tutoring']},{n:'Noah Fontaine',p:35,r:4.6,j:58,s:['Gardening','Pet care']},{n:'Elena Rossi',p:40,r:4.8,j:109,s:['Cleaning','Gardening']},{n:'Paul Girard',p:48,r:4.7,j:64,s:['Tutoring','Repairs']}];
   var order={},pm=null;
   function fmtDur(m){var h=Math.floor(m/60),r=m%60;return (h?h+' h':'')+(h&&r?' ':'')+(r?r+' min':'')}
   function chf(v){return 'CHF '+Number(v).toFixed(2)}
   function fmtDate(d){var p=d.split('-');return new Date(p[0],p[1]-1,p[2]).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
   var L=$('svcList');
   SERVICES.forEach(function(n){var b=document.createElement('button');b.className='tile';b.innerHTML='<span class="ico">'+ico(n)+'</span><span class="grow">'+n+'</span><span class="chev">\u203a</span>';b.onclick=function(){openSvc(n)};L.appendChild(b)});
-  function setDur(m){order.mins=m;$('durVal').textContent=fmtDur(m)}
+  function setDur(m){order.mins=m;$('durVal').textContent=fmtDur(m);if(order.fixed)$('priceTxt').textContent='CHF '+order.provider.p+'/h \u00b7 Total '+chf(order.provider.p*m/60)}
   $('durMinus').onclick=function(){setDur(Math.max(30,order.mins-30))};
   $('durPlus').onclick=function(){setDur(Math.min(720,order.mins+30))};
   function addrTxt(){var a=current.address;return a&&a.street?[a.street,a.apt,((a.zip||'')+' '+(a.city||'')).trim()].filter(Boolean).join(', '):''}
@@ -482,22 +516,23 @@ button.primary:disabled{opacity:.4;cursor:not-allowed}
     var r=this.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*300,y=(e.clientY-r.top)/r.height*180,p=$('pin');
     order.pin={x:x,y:y};p.setAttribute('transform','translate('+x+' '+y+')');p.style.display='block';
   };
-  function openSvc(n){
-    order={service:n,mins:60,loc:'registered',pin:null,provider:null};
+  function openSvc(n,prov,home){
+    order={service:n,mins:60,loc:'registered',pin:null,provider:prov||null,fixed:!!prov,home:!!(prov||home)};
     var t=new Date();t.setMinutes(t.getMinutes()-t.getTimezoneOffset());
     $('sfTitle').textContent=n;$('sfIcon').innerHTML=ico(n);
     $('fDate').min=t.toISOString().slice(0,10);$('fDate').value='';$('fChf').value='';$('mapLabel').value='';$('pin').style.display='none';
-    $('fErr').textContent='';setDur(60);setLoc('registered');go('SvcForm');
+    $('fErr').textContent='';$('compWrap').hidden=order.fixed;$('priceWrap').hidden=!order.fixed;$('sfProv').hidden=!order.fixed;if(order.fixed)$('sfProv').textContent='with '+prov.n;setDur(60);setLoc('registered');go('SvcForm');
   }
   $('fContinue').onclick=function(){
     var d=$('fDate').value,v=parseFloat($('fChf').value),e=$('fErr');
     if(!d){e.textContent='Choose a date.';return}
     if(d<$('fDate').min){e.textContent='Choose today or a later date.';return}
-    if(!(v>0)){e.textContent='Enter the compensation in CHF.';return}
+    if(!order.fixed&&!(v>0)){e.textContent='Enter the compensation in CHF.';return}
     if(order.loc==='registered'&&!addrTxt()){e.textContent='Add an address in Profile > Address, or pick a location on the map.';return}
     if(order.loc==='map'&&!order.pin){e.textContent='Tap the map to drop a pin.';return}
     e.textContent='';order.date=d;order.chf=v;
     order.locText=order.loc==='registered'?addrTxt():($('mapLabel').value.trim()||'Pin on map');
+    if(order.fixed){order.chf=order.provider.p*order.mins/60;goCart();return}
     order.provider=null;$('toCart').disabled=true;
     $('provSub').textContent=order.service+' \u00b7 '+fmtDate(d)+' \u00b7 '+fmtDur(order.mins);
     var P=$('provList');P.innerHTML='';
@@ -509,7 +544,7 @@ button.primary:disabled{opacity:.4;cursor:not-allowed}
     });
     go('Providers');
   };
-  $('toCart').onclick=function(){
+  function goCart(){
     var S=$('sum');S.innerHTML='';
     [['Service',order.service],['Date',fmtDate(order.date)],['Duration',fmtDur(order.mins)],['Location',order.locText],['Provider',order.provider.n],['Total',chf(order.chf)]].forEach(function(r){
       var d=document.createElement('div'),a=document.createElement('span'),b=document.createElement('span');d.className='sumrow';a.textContent=r[0];b.textContent=r[1];d.appendChild(a);d.appendChild(b);S.appendChild(d)});
@@ -517,7 +552,8 @@ button.primary:disabled{opacity:.4;cursor:not-allowed}
     var sv=$('pmSaved');sv.disabled=!current.card;sv.textContent=current.card?'Registered card \u2022\u2022\u2022\u2022 '+current.card.last4:'Registered card (none saved yet)';
     $('cardFields').hidden=true;['xName','xNum','xExp','xCvc'].forEach(function(i){$(i).value=''});
     $('payBtn').textContent='Pay '+chf(order.chf);$('payBtn').disabled=true;go('Cart');
-  };
+  }
+  $('toCart').onclick=goCart;
   function cardOk(){return $('xName').value.trim()&&$('xNum').value.replace(/\D/g,'').length>=12&&/^(0[1-9]|1[0-2])\/?\d{2}$/.test($('xExp').value.trim())&&/^\d{3,4}$/.test($('xCvc').value.trim())}
   function updatePay(){$('payBtn').disabled=!(pm&&(pm!=='card'||cardOk()))}
   hook('.pm',function(b){if(b.disabled)return;pm=b.dataset.pm;Array.prototype.forEach.call(document.querySelectorAll('.pm'),function(c){c.setAttribute('aria-pressed',c===b?'true':'false')});$('cardFields').hidden=pm!=='card';updatePay()});
@@ -526,11 +562,67 @@ button.primary:disabled{opacity:.4;cursor:not-allowed}
     var b=this;b.disabled=true;b.textContent='Processing\u2026';
     setTimeout(function(){
       var ref='DIFM-'+Math.floor(100000+Math.random()*900000);
+      var u=current,pv=order.provider,sv=order.service,amt=order.chf;
+      var bk={service:sv,prov:pv,date:order.date,mins:order.mins,chf:amt,status:'Requested'};
+      u.bookings=u.bookings||[];u.bookings.push(bk);SVC_USE[sv]=(SVC_USE[sv]||0)+1;
+      addNotif(u,'Payment confirmed',chf(amt)+' paid for '+sv.toLowerCase()+' with '+pv.n+'. Ref '+ref+'.','pay');
+      setTimeout(function(){bk.status='Accepted';addNotif(u,'Request accepted',pv.n+' accepted your '+sv.toLowerCase()+' request.','ok');if(current===u)renderHome()},6000);
       $('doneTxt').textContent=order.provider.n+' will receive your '+order.service.toLowerCase()+' request for '+fmtDate(order.date)+'. Reference '+ref+'.';
       ['xName','xNum','xExp','xCvc'].forEach(function(i){$(i).value=''});go('Done');
     },1200);
   };
   $('doneBtn').onclick=function(){go('Home')};
+  var SVC_USE={Cleaning:48,Cooking:41,Gardening:35,Repairs:29,'Pet care':22,Tutoring:15};
+  var NI={pay:'<path d="M3 7h18v10H3z"/><path d="M3 11h18"/>',ok:'<path d="M5 12.5l4.5 4.5L19 7.5"/>'};
+  function ini(n){return n.split(' ').map(function(w){return w[0]}).join('').slice(0,2)}
+  function mk(tag,cls,html){var e=document.createElement(tag);e.className=cls;if(html)e.innerHTML=html;return e}
+  function addNotif(u,t,x,k){u.notifs=u.notifs||[];u.notifs.unshift({t:t,x:x,k:k,at:new Date(),read:false});if(current===u)updateBadge()}
+  function updateBadge(){var n=(current.notifs||[]).filter(function(x){return !x.read}).length,b=$('badge');b.hidden=!n||!current.prefs.notif;b.textContent=n}
+  $('bell').onclick=function(){
+    var L=$('nList');L.innerHTML='';var N=current.notifs||[];
+    if(!N.length){L.appendChild(mk('p','empty','No notifications yet.'))}
+    N.forEach(function(x){
+      var d=mk('div','nt','<span class="ico"><svg viewBox="0 0 24 24">'+NI[x.k]+'</svg></span><span class="grow"><strong></strong><small></small><small></small></span>');
+      var q=d.querySelectorAll('strong,small');q[0].textContent=x.t;q[1].textContent=x.x;q[2].textContent=x.at.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      if(!x.read)d.appendChild(mk('span','dot'));L.appendChild(d);x.read=true;
+    });
+    updateBadge();go('Notifs');
+  };
+  function openProv(p){
+    $('ppAv').textContent=ini(p.n);$('ppName').textContent=p.n;$('ppMeta').textContent='\u2605 '+p.r.toFixed(1)+' \u00b7 '+p.j+' jobs \u00b7 CHF '+p.p+'/h';
+    var L=$('ppSvc');L.innerHTML='';
+    p.s.forEach(function(n){var b=mk('button','tile','<span class="ico">'+ico(n)+'</span><span class="grow">'+n+'</span><span class="chev">\u203a</span>');b.onclick=function(){openSvc(n,p,true)};L.appendChild(b)});
+    go('ProvPage');
+  }
+  function renderHome(){
+    $('hAv').textContent=ini((current.first+' '+current.last).trim()||current.first);updateBadge();
+    var C=$('carSvc');C.innerHTML='';
+    SERVICES.slice().sort(function(a,b){return SVC_USE[b]-SVC_USE[a]}).slice(0,5).forEach(function(n){
+      var b=mk('button','qc','<span class="ico">'+ico(n)+'</span><span>'+n+'</span>');b.onclick=function(){openSvc(n,null,true)};C.appendChild(b)});
+    var B=$('bookings');B.innerHTML='';
+    var t=new Date();t.setMinutes(t.getMinutes()-t.getTimezoneOffset());var today=t.toISOString().slice(0,10);
+    var up=(current.bookings||[]).filter(function(x){return x.date>=today}).sort(function(a,b){return a.date<b.date?-1:1});
+    if(!up.length)B.appendChild(mk('p','empty','No upcoming bookings yet. Request a service to get started.'));
+    up.forEach(function(x){
+      var d=mk('div','bk','<span class="ico">'+ico(x.service)+'</span><span class="grow"><strong></strong><small></small></span><span class="st'+(x.status==='Accepted'?' ok':'')+'"></span>');
+      d.querySelector('strong').textContent=x.service+' \u00b7 '+x.prov.n;d.querySelector('small').textContent=fmtDate(x.date)+' \u00b7 '+fmtDur(x.mins)+' \u00b7 '+chf(x.chf);d.querySelector('.st').textContent=x.status;B.appendChild(d)});
+    var P=$('carProv');P.innerHTML='';
+    PROV.slice().sort(function(a,b){return b.r-a.r||b.j-a.j}).slice(0,5).forEach(function(p){
+      var b=mk('button','pc','<span class="av">'+ini(p.n)+'</span><strong>'+p.n+'</strong><small>\u2605 '+p.r.toFixed(1)+' \u00b7 CHF '+p.p+'/h</small><small>'+p.s.join(', ')+'</small>');b.onclick=function(){openProv(p)};P.appendChild(b)});
+  }
+  function clearQ(){$('q').value='';$('qres').hidden=true}
+  $('q').oninput=function(){
+    var q=this.value.trim().toLowerCase(),R=$('qres'),n=0;R.innerHTML='';
+    if(!q){R.hidden=true;return}
+    SERVICES.filter(function(x){return x.toLowerCase().indexOf(q)>-1}).forEach(function(x){n++;
+      var b=mk('button','qr','<span class="ico">'+ico(x)+'</span><span><strong>'+x+'</strong><small>Service</small></span>');b.onclick=function(){clearQ();openSvc(x,null,true)};R.appendChild(b)});
+    PROV.filter(function(p){return p.n.toLowerCase().indexOf(q)>-1||p.s.join(' ').toLowerCase().indexOf(q)>-1}).forEach(function(p){n++;
+      var b=mk('button','qr','<span class="av">'+ini(p.n)+'</span><span><strong>'+p.n+'</strong><small>\u2605 '+p.r.toFixed(1)+' \u00b7 '+p.s.join(', ')+'</small></span>');b.onclick=function(){clearQ();openProv(p)};R.appendChild(b)});
+    if(!n)R.appendChild(mk('p','hint','No results'));
+    R.hidden=false;
+  };
+  $('sfBack').onclick=function(){go(order.fixed?'ProvPage':order.home?'Home':'Services')};
+  $('cartBack').onclick=function(){go(order.fixed?'SvcForm':'Providers')};
   $('logout').onclick=function(){
     current=null;$('app').hidden=true;$('auth').hidden=false;$('main').className='';
     $('email').value='';setMode('login');toast('Logged out');
